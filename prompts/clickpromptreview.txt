@@ -1,0 +1,51 @@
+VALIDATING POINT PROMPTS
+
+RUN1
+24 could not find patella
+35 messed up
+50 resumed
+56 messed up
+103 no patella
+118 no patella
+131 messed up
+177 no patella
+216 small patella
+252 small patella
+277 messed up
+299 messed up
+307 small patella
+351 small patella
+382 small patella
+391 small patella
+393 small patella
+398 small patella
+407 weird patella
+410 weird patella
+421 small patella
+425 small patella
+434 small patella
+450 small patella
+462 small patella
+
+RUN2
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9090290-20041116-10140412_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9788072-20050418-10378312_jpg-080 wrong
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9624170-20050930-10600514_jpg-080 wrong
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9495437-20040610-10052309_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9332345-20050614-10561212_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9421492-20050720-10428612_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9603227-20040402-10015009_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9995338-20050128-10349212_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9392537-20060504-11119312_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9179789-20051017-10204515_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9291078-20050124-10157012_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9545822-20050614-10559012_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9114036-20050914-10580229_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9491365-20050622-10936912_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9817241-20050324-10751009_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9002430-20050620-10934812_jpg-080 wrong
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9908089-20060114-10803716_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.C.2-9457359-20040727-10231114_jpg-080 patella
+-home-asy51-vstor-data-oai-image03-00m-0.E.1-9087632-20050803-10453808_jpg-080 patella
+
+wrongs in RUN2 have been fixed
