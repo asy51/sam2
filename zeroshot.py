@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import argparse
 from sam2.build_sam import build_sam2_video_predictor
+from sam2.build_sam import build_sam2
+from sam2.sam2_image_predictor import SAM2ImagePredictor
 import glob
 import pandas as pd
 import matplotlib
+import time
+import sys
 
 # use bfloat16 for the entire notebook
 torch.autocast(device_type="cuda", dtype=torch.bfloat16).__enter__()
@@ -19,6 +23,7 @@ if torch.cuda.get_device_properties(0).major >= 8:
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-m', '--model', type=str, default='l')
+# parser.add_argument('-i', '--image', action='store_true')
 parser.add_argument('-n', '--negatives', action='store_true')
 opt = parser.parse_args()
 
@@ -38,7 +43,11 @@ if opt.model == 'b':
 pred_name = f'predbone_{opt.model}{"_neg" if opt.negatives else ""}.npz'
 print(pred_name)
 
+# if opt.image:
+    # predictor = SAM2ImagePredictor(build_sam2(model_cfg, sam2_checkpoint))
+# else:
 predictor = build_sam2_video_predictor(model_cfg, sam2_checkpoint)
+
 
 FRAME_NDX = 80
 FEMUR_ID = 1
@@ -105,7 +114,6 @@ for row_ndx, row in df.iterrows():
             out_obj_id: (out_mask_logits[i] > 0.0).cpu().numpy()
             for i, out_obj_id in enumerate(out_obj_ids)
         }
-
     # for out_frame_idx in range(0, len(frames), VIS_FRAME_STRIDE):
     #     fig, ax = plt.subplots(figsize=(4,4))
     #     ax.set_title(f"frame {out_frame_idx}")
