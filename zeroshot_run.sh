@@ -3,20 +3,25 @@
 #SBATCH --partition=aisc
 #SBATCH --job-name=SAM2
 #SBATCH --time=1-00:00:00
-#SBATCH --array=0-3
+#SBATCH --array=0-23
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=20G
 #SBATCH --gres=gpu:1
 
-VALUES=(t s l b)
-VALUE=${VALUES[$SLURM_ARRAY_TASK_ID]}
-NEGATIVE="-n"
-echo $VALUE $NEGATIVE
+MODELS=(t s l b)
+PROMPTS=(point mask box)
+DIMS=("3" "2")
 
-# Activate your Python environment, if needed
+MODEL_INDEX=$((SLURM_ARRAY_TASK_ID / 6))
+PROMPT_INDEX=$(((SLURM_ARRAY_TASK_ID / 2) % 3))
+DIM_INDEX=$((SLURM_ARRAY_TASK_ID % 2))
+
+MODEL=${MODELS[$MODEL_INDEX]}
+PROMPT=${PROMPTS[$PROMPT_INDEX]}
+DIM=${DIMS[$DIM_INDEX]}
+
+echo "Running configuration: MODEL=$MODEL, PROMPT=$PROMPT, DIMS=$DIM"
 conda activate sam2
-
-# Run the Python script with the part number
 cd /home/asy51/repos/segment-anything-2/
-srun python -u zeroshot.py -m $VALUE $NEGATIVE
+srun python -u zeroshot.py --model $MODEL --prompt $PROMPT --dims $DIM

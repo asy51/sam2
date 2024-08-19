@@ -16,6 +16,7 @@ import monai.transforms as MT
 import ast
 import SimpleITK as sitk
 from sam2.utils.misc import mask_to_box
+import sys
 
 # use bfloat16 for the entire notebook
 torch.autocast(device_type="cuda", dtype=torch.bfloat16).__enter__()
@@ -79,8 +80,8 @@ class JPEGDS(torch.utils.data.Dataset):
         ret['center'][PATELLA] = [ret['patella_x'], ret['patella_y']]
         return ret
     
-def make_pred(predictor, d, image=True, prompt='point', negatives=False, **kwargs):
-    if image:
+def make_pred(predictor, d, dims=3, prompt='point', negatives=False, **kwargs):
+    if dims == 2:
         image_batch = [Image.open(f'{d["jpgdir"]}/{i:03d}.jpg').convert('RGB') for i in range(N_SLC)]
         pred = {}
         for BONE, bone_str in enumerate(['femur', 'tibia']):
@@ -103,8 +104,9 @@ def make_pred(predictor, d, image=True, prompt='point', negatives=False, **kwarg
                 )
                 pred[BONE].append(masks)
             pred[BONE] = np.concat(pred[BONE])
-        pred = np.stack([pred[FEMUR], pred[TIBIA]])
-    else:
+        pred = np.stack([pred[FEMUR], pred[TIBIA]], dtype=bool)
+
+    elif dims == 3:
         inference_state = predictor.init_state(video_path=d["jpgdir"])
         predictor.reset_state(inference_state)
         if prompt == 'mask':
@@ -160,7 +162,8 @@ def make_pred(predictor, d, image=True, prompt='point', negatives=False, **kwarg
                 out_obj_id: (out_mask_logits[i] > 0.0).cpu().numpy()
                 for i, out_obj_id in enumerate(out_obj_ids)
             }
-        pred = {BONE: np.concat([video_segments[idx][BONE] for idx in range(N_SLC)]) for BONE in video_segments[0].keys()}
+        pred = np.stack([np.concat([video_segments[idx][BONE] for idx in range(N_SLC)]) for BONE in sorted(video_segments[0].keys())])
+
     return pred
 
 if __name__ == '__main__':
@@ -168,8 +171,8 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model', type=str, default='l')
     parser.add_argument('-p', '--prompt', type=str, default='point')
     parser.add_argument('-n', '--negatives', action='store_true')
-    parser.add_argument('-i', '--image', action='store_true')
-    opt = parser.parse_args(['--model', 't', '--prompt', 'mask',])
+    parser.add_argument('-d', '--dims', type=int, default=3)
+    opt = parser.parse_args()
 
     if opt.model == 't':
         sam2_checkpoint = "/home/asy51/repos/segment-anything-2/checkpoints/sam2_hiera_tiny.pt"
@@ -184,10 +187,10 @@ if __name__ == '__main__':
         sam2_checkpoint = "/home/asy51/repos/segment-anything-2/checkpoints/sam2_hiera_base_plus.pt"
         model_cfg = "sam2_hiera_b+.yaml"
 
-    pred_name = f'predbone_{opt.model}{"_neg" if opt.negatives else ""}.npz'
+    pred_name = f'predbone_{opt.model}{"_neg" if opt.negatives else ""}_{opt.prompt}{"_img" if opt.dims == 2 else "_vid"}'
     print(pred_name)
 
-    if opt.image:
+    if opt.dims == 2:
         predictor = SAM2ImagePredictor(build_sam2(model_cfg, sam2_checkpoint))
     else:
         predictor = build_sam2_video_predictor(model_cfg, sam2_checkpoint)
@@ -197,10 +200,8 @@ if __name__ == '__main__':
     for d in ds:
         pred = make_pred(predictor, d, **vars(opt))
         pred_path = f"{d['jpgdir']}/{pred_name}.npz"
-        np.savez_compressed(pred_path, np.stack([pred[1], pred[2], pred[3]]))
+        np.savez_compressed(pred_path, pred)
         print(pred_path)
-
-
 
     # fig, ax = plt.subplots()
     # ax.matshow(np.array(Image.open(row['jpg'])), cmap='gray')
