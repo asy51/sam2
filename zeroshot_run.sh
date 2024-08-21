@@ -3,14 +3,14 @@
 #SBATCH --partition=aisc
 #SBATCH --job-name=SAM2
 #SBATCH --time=1-00:00:00
-#SBATCH --array=0-23
+#SBATCH --array=0-31
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=20G
+#SBATCH --mem=10GB
 #SBATCH --gres=gpu:1
 
 MODELS=(t s l b)
-PROMPTS=(point mask box)
+PROMPTS=(point pointneg mask box)
 DIMS=("3" "2")
 
 MODEL_INDEX=$((SLURM_ARRAY_TASK_ID / 6))
