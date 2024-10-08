@@ -81,7 +81,7 @@ def dice_fn(a,b):
 
 class JPEGDS(torch.utils.data.Dataset):
     def __init__(self):
-        df = pd.read_csv('img_and_mask.csv')
+        df = pd.read_csv('/home/asy51/repos/segment-anything-2/img_and_mask.csv')
         df['jpgdir'] = df['IMAGE_PATH_SAG_3D_DESS'].str.replace('.tar.gz','_jpg')
 
         ff = pd.read_csv('/home/asy51/repos/segment-anything-2/prompts/coords.csv') # manual prompts
@@ -122,7 +122,7 @@ def make_pred(predictor, d, dims=3, prompt='point', components=['femur', 'femur_
                 predictor.set_image(image_batch[slc_ndx])
                 points = labels = box = None
                 if prompt == 'pointneg':
-                    points = np.array([mask_to_point(d['mask'][b][start_ndx])[None,...] for b in components], dtype=np.float32)
+                    points = np.array([mask_to_point(d['mask'][b][start_ndx]) for b in components], dtype=np.float32)
                     labels = np.array([0] * len(components), dtype=np.int32)
                     labels[bone_ndx] = 1
                 elif prompt == 'point':
@@ -214,6 +214,12 @@ if __name__ == '__main__':
 
     predname = f'{opt.model}_{opt.prompt}{"_img" if opt.dims == 2 else "_vid"}'
     print(predname)
+    if os.path.exists(f'results/skeltroid/{predname}.csv'):
+        print('already done! :)')
+        sys.exit(0)
+    if predname in ['t_box_vid', 't_box_img', 'b_box_img', 's_box_vid', 'b_box_vid', 'l_box_img', 'l_box_vid', 's_box_img']:
+        print('already running D:')
+        sys.exit(0)
 
     if opt.dims == 2:
         predictor = SAM2ImagePredictor(build_sam2(model_cfg, sam2_checkpoint))

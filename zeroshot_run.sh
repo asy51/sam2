@@ -13,15 +13,15 @@ MODELS=(t s l b)
 PROMPTS=(point pointneg mask box)
 DIMS=("3" "2")
 
-MODEL_INDEX=$((SLURM_ARRAY_TASK_ID / 6))
-PROMPT_INDEX=$(((SLURM_ARRAY_TASK_ID / 2) % 3))
+MODEL_INDEX=$((SLURM_ARRAY_TASK_ID / 8))
+PROMPT_INDEX=$(((SLURM_ARRAY_TASK_ID / 2) % 4))
 DIM_INDEX=$((SLURM_ARRAY_TASK_ID % 2))
 
 MODEL=${MODELS[$MODEL_INDEX]}
 PROMPT=${PROMPTS[$PROMPT_INDEX]}
 DIM=${DIMS[$DIM_INDEX]}
 
-echo "Running configuration: MODEL=$MODEL, PROMPT=$PROMPT, DIMS=$DIM"
+echo "$(hostname): MODEL=$MODEL, PROMPT=$PROMPT, DIMS=$DIM"
 conda activate sam2
 cd /home/asy51/repos/segment-anything-2/
-srun python -u zeroshot.py --model $MODEL --prompt $PROMPT --dims $DIM
+srun python -u finetune.py -bone $BONE
